@@ -1,0 +1,23 @@
+// if (!process.env.IS_TS_NODE) {
+//   require('module-alias/register');
+// }
+
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  // Enable CORS for GitHub Pages and local development
+  app.enableCors({
+    origin: process.env.NODE_ENV === 'production'
+      ? process.env.FRONTEND_URL || 'https://pastelnova.github.io' // Update repo name if different
+      : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'], // Vite/Angular dev servers
+    credentials: true,
+  });
+
+  await app.listen(process.env.PORT ?? 3000);
+}
+bootstrap();
+
+// "start:prod": "node dist/main",
