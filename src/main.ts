@@ -10,9 +10,14 @@ async function bootstrap() {
 
   // Enable CORS for GitHub Pages and local development
   app.enableCors({
-    origin: process.env.NODE_ENV === 'production'
-      ? process.env.FRONTEND_URL || 'https://pastelnova.github.io' // Update repo name if different
-      : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'], // Vite/Angular dev servers
+    origin:
+      process.env.NODE_ENV === 'production'
+        ? process.env.FRONTEND_URL || 'https://pastelnova.github.io'
+        : [
+            'http://localhost:3000',
+            'http://localhost:3001',
+            'http://localhost:5173',
+          ],
     credentials: true,
   });
 

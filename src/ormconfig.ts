@@ -7,7 +7,10 @@ const config: DataSourceOptions = process.env.DATABASE_URL
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: false,
       migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
-      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+      ssl:
+        process.env.NODE_ENV === 'production'
+          ? { rejectUnauthorized: false }
+          : false,
     }
   : {
       type: 'postgres',
