@@ -45,7 +45,7 @@ export class UserService {
     if (!user) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
-    return user; // TypeScript knows this is UserEntity
+    return user;
   }
 
   async login(loginUserDto: LoginUserDto): Promise<UserEntity> {
