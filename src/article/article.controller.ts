@@ -42,10 +42,11 @@ export class ArticleController {
 
   @Post()
   @UseGuards(AuthGuard)
-  @UsePipes(new BackendValidationPipe())
+  // @UsePipes(new BackendValidationPipe())
   async create(
     @User() currentUser: UserEntity,
-    @Body('article') createArticleDto: CreateArticleDto,
+    @Body('article', new BackendValidationPipe())
+    createArticleDto: CreateArticleDto,
   ): Promise<ArticleResponseInterface> {
     const article = await this.articleService.createArticle(
       currentUser,

@@ -7,30 +7,29 @@ import {
   ValidationError,
 } from '@nestjs/common';
 import { validate } from 'class-validator';
-import { plainToClass } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
-export class BackendValidationPipe implements PipeTransform {
-  async transform(value: any, metadata: ArgumentMetadata) {
-    if (!metadata.metatype) {
+export class BackendValidationPipe implements PipeTransform<any> {
+  async transform(value: any, { metatype }: ArgumentMetadata) {
+    if (!metatype || !this.toValidate(metatype)) {
       return value;
     }
 
-    const object = plainToClass(metadata.metatype, value);
-
-    if (typeof object !== 'object') {
-      return value;
-    }
+    const object = plainToInstance(metatype, value);
     const errors = await validate(object);
-
-    if (errors.length === 0) {
-      return value;
+    if (errors.length > 0) {
+      throw new HttpException(
+        { errors: this.formatErrors(errors) },
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
     }
+    return value;
+  }
 
-    throw new HttpException(
-      { errors: this.formatErrors(errors) },
-      HttpStatus.UNPROCESSABLE_ENTITY,
-    );
+  private toValidate(metatype: Function): boolean {
+    const types: Function[] = [String, Boolean, Number, Array, Object];
+    return !types.includes(metatype);
   }
 
   formatErrors(errors: ValidationError[]) {
