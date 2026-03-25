@@ -8,6 +8,7 @@ import { ArticleResponseInterface } from './types/articleResponse.interface';
 import slugify from 'slugify';
 import { ArticlesResponseInterface } from './types/articlesResponse.interface';
 import { FollowEntity } from '@app/profile/types/follow.entity';
+import { TagEntity } from '@app/tag/tag.entity';
 
 @Injectable()
 export class ArticleService {
@@ -18,6 +19,8 @@ export class ArticleService {
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(FollowEntity)
     private readonly followRepository: Repository<FollowEntity>,
+    @InjectRepository(TagEntity)
+    private readonly tagRepository: Repository<TagEntity>,
     private dataSource: DataSource,
   ) {}
 
@@ -148,6 +151,24 @@ export class ArticleService {
 
     article.slug = this.generateSlug(createArticleDto.title);
 
+    if (article.tagList.length > 0) {
+      const existingTags = await this.tagRepository.find();
+      const existingTagNames = existingTags.map((tag) => tag.name);
+
+      const newTagNames = article.tagList.filter(
+        (tagName) => !existingTagNames.includes(tagName),
+      );
+
+      if (newTagNames.length > 0) {
+        const newTags = newTagNames.map((name) => {
+          const tag = new TagEntity();
+          tag.name = name;
+          return tag;
+        });
+        await this.tagRepository.save(newTags);
+      }
+    }
+
     return await this.articleRepository.save(article);
   }
 
@@ -188,6 +209,25 @@ export class ArticleService {
     }
 
     Object.assign(article, updateArticleDto);
+
+    if (article.tagList?.length > 0) {
+      const existingTags = await this.tagRepository.find();
+      const existingTagNames = existingTags.map((tag) => tag.name);
+
+      const newTagNames = article.tagList.filter(
+        (tagName) => !existingTagNames.includes(tagName),
+      );
+
+      if (newTagNames.length > 0) {
+        const newTags = newTagNames.map((name) => {
+          const tag = new TagEntity();
+          tag.name = name;
+          return tag;
+        });
+        await this.tagRepository.save(newTags);
+      }
+    }
+
     return await this.articleRepository.save(article);
   }
 
